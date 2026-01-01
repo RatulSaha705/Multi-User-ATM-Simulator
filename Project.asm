@@ -199,7 +199,9 @@ Enter_pass db "Enter Your Password: $"
 No_Acc_Found_str db "No Account Found$"
 Wrong_PassWord_str db "Your Password is Wrong$"
 User_Option_str db "Choose an Option: $"
-Account_Block_For_Multiple_Attempt_str db "This Account is blocked Due to Multiple Failed Attempt$" 
+Account_Block_For_Multiple_Attempt_str db "This Account is blocked Due to Multiple Failed Attempt$"  
+
+Max_Limit_Exceeded_str  db "Deposite Failed.You Exceed Maximum Balance Limit$"
 
 option_1 db "1.Current Balance$"
 option_2 db "2.Deposite$"
@@ -214,7 +216,7 @@ Current_Pass dw 0
 Current_option db 0 
  
 ;Main Details Array       
-BALANCE_ARRAY dw 3000,4000,2000,30000, 2000,500,6000,3000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
+BALANCE_ARRAY dw 30000,4000,2000,30000, 2000,500,6000,3000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
 
 ACCOUNT_NUMBER_ARRAY dw 00001,00002,00003,00004,00005,00006,00007,00008,00009,00010   ;Ten User index format 0,2,4,6,8,10,12,14,16,18 
 
@@ -515,7 +517,7 @@ WITHDRAW proc   ; Use di as the acc index
         mov ah,9
         lea dx, Insuffient_money_str 
         int 21h  
-        jmp Exit_WithDraw:
+        jmp Exit_WithDraw
     
     Give_mul_of_500_withdraw:
         mov ah,9
@@ -551,6 +553,8 @@ DEPOSITE proc    ;;use di as acc index
     mov ax,Current_deposite
     mov bx,BALANCE_ARRAY[di] ;use di as acc index
     add bx,ax 
+    cmp bx,0
+    jl Max_Limit_Exceeded
     
     mov BALANCE_ARRAY[di],bx   ;use di as acc index
     
@@ -592,6 +596,11 @@ DEPOSITE proc    ;;use di as acc index
     
     jmp Exit_Deposite
     
+    Max_Limit_Exceeded:
+        mov ah,9
+        lea dx, Max_Limit_Exceeded_str 
+        int 21h  
+        jmp Exit_Deposite
         
     
     Give_mul_of_500_deposite:
