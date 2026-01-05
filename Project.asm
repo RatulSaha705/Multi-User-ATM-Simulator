@@ -178,7 +178,8 @@ three dw 0
 four dw 0
 five dw 0  
 
-;Supporting String 
+;Supporting String  
+welcome_str db "                            Welcome to ATM Service$"
 Insuffient_money_str db "Insufficient Balance.$"
 WithDraw_str db "Enter Withdrawal Amount: $"
 WithDraw_Sucess_str db "Money Withdrawal Sucessful.New Balance: $" 
@@ -207,7 +208,8 @@ option_1 db "1.Current Balance$"
 option_2 db "2.Deposite$"
 option_3 db "3.Withdraw$"
 option_4 db "4.Mini Statement$"
-option_5 db "5.Exit$"
+option_5 db "5.Exit$" 
+
 ;Input Supporting                                                                      
 Current_withdraw dw 0
 Current_deposite dw 0
@@ -216,7 +218,7 @@ Current_Pass dw 0
 Current_option db 0 
  
 ;Main Details Array       
-BALANCE_ARRAY dw 30000,4000,2000,30000, 2000,500,6000,3000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
+BALANCE_ARRAY dw 30000,4000,2000,3000, 2000,500,6000,25000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
 
 ACCOUNT_NUMBER_ARRAY dw 00001,00002,00003,00004,00005,00006,00007,00008,00009,00010   ;Ten User index format 0,2,4,6,8,10,12,14,16,18 
 
@@ -242,7 +244,16 @@ MAIN PROC
 MOV AX,@DATA
 MOV DS,AX
  
-; enter your code here
+; enter your code here    
+mov ah,9
+lea dx ,welcome_str
+int 21h  
+
+new_line 
+new_line
+
+
+
 Main_ATM_SERVICE:
 
     mov ah,9
