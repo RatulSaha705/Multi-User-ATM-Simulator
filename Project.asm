@@ -203,12 +203,14 @@ User_Option_str db "Choose an Option: $"
 Account_Block_For_Multiple_Attempt_str db "This Account is blocked Due to Multiple Failed Attempt$"  
 
 Max_Limit_Exceeded_str  db "Deposite Failed.You Exceed Maximum Balance Limit$"
+WithDraw_Max_Limit_str db "Can not withdraw more than 32500 at once$"
 
 option_1 db "1.Current Balance$"
 option_2 db "2.Deposite$"
 option_3 db "3.Withdraw$"
 option_4 db "4.Mini Statement$"
 option_5 db "5.Exit$" 
+No_option_str db "No Available Service in this option$"
 
 ;Input Supporting                                                                      
 Current_withdraw dw 0
@@ -346,7 +348,13 @@ Main_ATM_SERVICE:
     cmp al,5
     je Log_in_exit 
     
+    
+    mov ah,9
+    lea dx,No_option_str
+    int 21h 
+    new_line 
     new_line
+    
     jmp User_Option
     
     BALANCE_PROC:
@@ -446,7 +454,7 @@ BALANCE proc
     Five_Digit_out BALANCE_ARRAY[di] 
     new_line
     ret
-endp BALACE
+endp BALANCE
 
     
 
@@ -469,7 +477,11 @@ WITHDRAW proc   ; Use di as the acc index
     mov bx,500
     div bx
     cmp dx,0
-    jne Give_mul_of_500_withdraw 
+    jne Give_mul_of_500_withdraw  
+    
+    ;Check If Amount is more than 32500
+    cmp Current_withdraw,0     ;Greater than 32768== nagative number
+    jl WithDraw_Max_Limit 
     
     ;Main WithDrawal Proccess   
     mov ax,Current_withdraw
@@ -521,7 +533,13 @@ WITHDRAW proc   ; Use di as the acc index
         
          
     
-    jmp Exit_WithDraw
+    jmp Exit_WithDraw 
+    
+    WithDraw_Max_Limit:
+        mov ah,9
+        lea dx ,WithDraw_Max_Limit_str
+        int 21h
+        jmp Exit_Withdraw
     
     
     Insuffient_money:
