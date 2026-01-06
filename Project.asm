@@ -218,7 +218,7 @@ Current_Pass dw 0
 Current_option db 0 
  
 ;Main Details Array       
-BALANCE_ARRAY dw 30000,4000,2000,3000, 2000,500,6000,25000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
+BALANCE_ARRAY dw 3000,4000,2000,3000, 2000,500,6000,25000,8000,1000  ;Ten User index format 0,2,4,6,8,10,12,14,16,18    
 
 ACCOUNT_NUMBER_ARRAY dw 00001,00002,00003,00004,00005,00006,00007,00008,00009,00010   ;Ten User index format 0,2,4,6,8,10,12,14,16,18 
 
@@ -228,9 +228,9 @@ FAILED_LOGIN_COUNT dw 0,0,0,0,0,0,0,0,0,0
 
 
 ;Sratement Supporting 
-Statement_acc db 0
+;Statement_acc db 0
 
-Statement_Tag_ARRAY dw 50 dup(?)
+Statement_Tag_ARRAY dw 50 dup(?) 
                                                                                                    
 Statement_Value_ARRAY dw 50 dup(?)
 
@@ -271,9 +271,9 @@ Main_ATM_SERVICE:
     Check_Account:
     cmp ax,ACCOUNT_NUMBER_ARRAY[si]   ;Compare
     jne Next_Account_Check
-     
-    Check_PassWord:
-    mov ax, FAILED_LOGIN_COUNT[si]
+                                 
+    Check_PassWord:              
+    mov ax, FAILED_LOGIN_COUNT[si]     ;Account index stored in si
     cmp ax,2
     jg Account_Block_For_Multiple_Attempt
     
@@ -324,10 +324,10 @@ Main_ATM_SERVICE:
     mov ah,1
     int 21h
     sub al,30h
-    mov Current_option,al 
+    mov Current_option,al     ;One digit option input
     new_line
     
-    mov al,Current_option
+    mov al,Current_option     ;To compare option
     
     cmp al,1
     je BALANCE_PROC 
@@ -492,30 +492,30 @@ WITHDRAW proc   ; Use di as the acc index
         mov ax, di ; Use di as the acc index
         mov bx,10
         mul bx
-        mov si,ax     ;row at si 
+        mov si,ax     ;user start statement index at si 
         ;add si,6
         
-        mov ax,Current_withdraw
+        mov ax,Current_withdraw  
         mov dx,Statement_Tag_ARRAY[si]
         mov Statement_Tag_ARRAY[si],'w'
         mov cx,Statement_Value_ARRAY[si]
         mov Statement_Value_ARRAY[si], ax
         
         
-        add si,2
+        add si,2  ;index 2
         xchg Statement_Tag_ARRAY[si],dx 
-        mov bx, Statement_Tag_ARRAY[si] ;trst
+        ;mov bx, Statement_Tag_ARRAY[si] ;test
         xchg Statement_Value_ARRAY[si],cx
         
-        add si,2
+        add si,2    ;index 4
         xchg Statement_Tag_ARRAY[si],dx
         xchg Statement_Value_ARRAY[si],cx   
         
-        add si,2
+        add si,2    ;index 6
         xchg Statement_Tag_ARRAY[si],dx 
         xchg Statement_Value_ARRAY[si],cx
         
-        add si,2
+        add si,2    ;index 8
         xchg Statement_Tag_ARRAY[si],dx
         xchg Statement_Value_ARRAY[si],cx
         
@@ -564,7 +564,7 @@ DEPOSITE proc    ;;use di as acc index
     mov ax,Current_deposite
     mov bx,BALANCE_ARRAY[di] ;use di as acc index
     add bx,ax 
-    cmp bx,0
+    cmp bx,0   ; Greater than 32768== nagative number 
     jl Max_Limit_Exceeded
     
     mov BALANCE_ARRAY[di],bx   ;use di as acc index
